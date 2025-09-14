@@ -3,7 +3,7 @@ import { prismaClient } from '../prisma';
 
 const router = express.Router();
 
-router.get('/',async (req,res)=>{
+router.post('/get',async (req,res)=>{
     const {userId}= req.body;
     if (!userId){
         res.status(400).json({

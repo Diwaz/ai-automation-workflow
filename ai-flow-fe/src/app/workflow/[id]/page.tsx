@@ -35,16 +35,27 @@ export default function Page(params: Promise<{ id: string }>) {
     taskNode: TaskNode,
     aiNode: AiNode,
   };
-  const handleDbSave = async () => {
-    await prisma.workflow.create({
-        data :{
-            title:"test02",
-            nodes:JSON.stringify(nodes),
-            connetions: JSON.stringify(edges),
-            enabled: false,
+    const handleFetchData =async () =>{
+        const myHeaders  = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify({
+                userId: "bf62dba5-4fff-4823-a147-00ac00630169"
+            })
         }
-    })
-  }
+    const response = await fetch("http://localhost:5000/api/v1/workflow/get",requestOptions).then((res)=>res.json()).then((result)=>{
+
+        return result
+    }).catch((err)=>console.log("err",err));
+    const currentWorkflow = response.message[0]
+    console.log("response from server",currentWorkflow.nodes)
+    console.log("response from server",currentWorkflow.connections)
+    setNodes(currentWorkflow.nodes)
+    setEdges(currentWorkflow.connections)
+
+    }
   const handleAddNode = ({ name, type, variant }: newNodeParams) => {
     const newNodeId = crypto.randomUUID();
     const newNode: Node = {
@@ -75,8 +86,10 @@ export default function Page(params: Promise<{ id: string }>) {
   return (
     <div className=" w-screen h-screen">
         <button onClick={()=>{
-            handleDbSave()
-        }}>Save</button>
+            handleFetchData()
+        }}>
+            Load Data
+        </button>
       <ReactFlowProvider>
         <ReactFlow
           style={{ height: "90%" }}
