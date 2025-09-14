@@ -1,7 +1,7 @@
 import { Edge, Node } from "@xyflow/react";
 type nodesTreeValue = {
   id: string;
-  variant: string;
+//   variant: string;
   type: string;
   children: string[];
 };
@@ -9,7 +9,7 @@ type nodesTreeValue = {
 export const getDependencyData = (nodes: Node[], edges: Edge[]) => {
   const nodesTree: nodesTreeValue[] = nodes.map((n) => ({
     id: n.id,
-    variant: n.data.variant as string,
+    // variant: n.data.variant as string,
     type: n.data.type as string,
     children: [],
   }));
@@ -19,6 +19,7 @@ export const getDependencyData = (nodes: Node[], edges: Edge[]) => {
   const nodeMap = Object.fromEntries(nodesTree.map((n) => [n.id, n]));
 
   //search for the no deIds in edges (source and target)
+  console.log("this is how edges look",edges)
   edges.forEach((edge) => {
     const parent = nodeMap[edge.source];
     if (parent) {
@@ -26,6 +27,6 @@ export const getDependencyData = (nodes: Node[], edges: Edge[]) => {
     }
   });
   const payload = nodesTree.filter((el) => el.children.length > 0);
-
+  console.log("nodesTree ,,,,,,,,,,",nodesTree);
   return payload;
 };

@@ -21,15 +21,30 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
 import { NodeSheet } from "@/components/SheetComponent";
+import { getDependencyData } from "@/helper/dependency";
+import prisma from "@/lib/prisma";
 
 export default function Page(params: Promise<{ id: string }>) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const data = getDependencyData(nodes,edges);
+  console.log("payload data",JSON.stringify(nodes));
+  console.log("edge data",JSON.stringify(edges));
   const { isOpen, openSheet, closeSheet } = useSheetStore();
   const nodeTypes: NodeTypes = {
     taskNode: TaskNode,
     aiNode: AiNode,
   };
+  const handleDbSave = async () => {
+    await prisma.workflow.create({
+        data :{
+            title:"test02",
+            nodes:JSON.stringify(nodes),
+            connetions: JSON.stringify(edges),
+            enabled: false,
+        }
+    })
+  }
   const handleAddNode = ({ name, type, variant }: newNodeParams) => {
     const newNodeId = crypto.randomUUID();
     const newNode: Node = {
@@ -59,6 +74,9 @@ export default function Page(params: Promise<{ id: string }>) {
 
   return (
     <div className=" w-screen h-screen">
+        <button onClick={()=>{
+            handleDbSave()
+        }}>Save</button>
       <ReactFlowProvider>
         <ReactFlow
           style={{ height: "90%" }}
