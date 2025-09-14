@@ -23,6 +23,7 @@ import { useCallback } from "react";
 import { NodeSheet } from "@/components/SheetComponent";
 import { getDependencyData } from "@/helper/dependency";
 import prisma from "@/lib/prisma";
+import { DialogButton } from "@/components/Dialog";
 
 export default function Page(params: Promise<{ id: string }>) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -85,12 +86,15 @@ export default function Page(params: Promise<{ id: string }>) {
 
   return (
     <div className=" w-screen h-screen">
-        <button onClick={()=>{
-            handleFetchData()
-        }}>
-            Load Data
-        </button>
-      <ReactFlowProvider>
+        <div className="flex justify-around">
+            <button className="bg-red-400 px-2">Save Data</button>
+            <button className="bg-green-500 px-2">Load Data</button>
+            {/* <button className="bg-purple-600 px-2">Load Creds</button> */}
+            <DialogButton 
+            buttonName={'Load Creds'}
+            />
+        </div>
+     <ReactFlowProvider>
         <ReactFlow
           style={{ height: "90%" }}
           minZoom={0.8}
@@ -105,7 +109,7 @@ export default function Page(params: Promise<{ id: string }>) {
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         >
           <Controls className="text-black" position="top-left" />
-          <Background gap={10} size={1.5} bgColor="#474649" />
+          <Background gap={20} size={1} bgColor="#2d2e2e" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer">
             {nodes.length === 0 && <PlaceholderNode />}
           </div>
@@ -116,14 +120,7 @@ export default function Page(params: Promise<{ id: string }>) {
             openSheet={openSheet}
             addNewNode={handleAddNode}
           />
-
-          <div
-            className="text-[40rem] 
-          text-neutral-400/10
-          absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          >
-        
-          </div>
+            <div>Hello</div>
         </ReactFlow>
       </ReactFlowProvider>
     </div>

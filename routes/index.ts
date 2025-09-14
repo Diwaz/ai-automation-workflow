@@ -2,6 +2,7 @@ import express from 'express';
 import workflowRoutes from './workflow';
 import { prismaClient } from '../prisma';
 
+
 const router = express.Router();
 
 
@@ -9,8 +10,8 @@ const router = express.Router();
 router.use('/workflow',workflowRoutes)
 
 router.post('/credential',async (req,res)=>{
-    const {userId, provider , apiKey} = req.body;
-    if (!userId || !provider || !apiKey){
+    const {userId, provider , apiKey,title} = req.body;
+    if (!userId || !provider || !apiKey || !title){
         res.status(404).json({
             message:"Invalid input"
         })
@@ -20,7 +21,8 @@ router.post('/credential',async (req,res)=>{
         data:{
             provider,
             apiKey,
-            userId
+            userId,
+            title
         }
     })
         console.log("response from creating creds",response);

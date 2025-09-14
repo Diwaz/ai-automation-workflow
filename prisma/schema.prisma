@@ -25,6 +25,7 @@ model User {
 }
 model Credential {
   id String @id @default(uuid())
+  title String @unique 
   provider String
   apiKey String @unique
 
