@@ -37,7 +37,7 @@ model Workflow {
   title String
   enabled Boolean
   nodes Json
-  connetions Json
+  connections Json
   createdAt DateTime @default(now())
 
   userId String
