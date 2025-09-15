@@ -21,43 +21,18 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
 import { NodeSheet } from "@/components/SheetComponent";
-import { getDependencyData } from "@/helper/dependency";
-import prisma from "@/lib/prisma";
 import { DialogInput } from "@/components/Dialog";
 import { DialogList } from "@/components/DialogList";
 
 export default function Page(params: Promise<{ id: string }>) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-  const data = getDependencyData(nodes,edges);
-  console.log("payload data",JSON.stringify(nodes));
-  console.log("edge data",JSON.stringify(edges));
   const { isOpen, openSheet, closeSheet } = useSheetStore();
   const nodeTypes: NodeTypes = {
     taskNode: TaskNode,
     aiNode: AiNode,
   };
-    const handleFetchData =async () =>{
-        const myHeaders  = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        const requestOptions = {
-            method: "POST",
-            headers: myHeaders,
-            body: JSON.stringify({
-                userId: "bf62dba5-4fff-4823-a147-00ac00630169"
-            })
-        }
-    const response = await fetch("http://localhost:5000/api/v1/workflow/get",requestOptions).then((res)=>res.json()).then((result)=>{
 
-        return result
-    }).catch((err)=>console.log("err",err));
-    const currentWorkflow = response.message[0]
-    console.log("response from server",currentWorkflow.nodes)
-    console.log("response from server",currentWorkflow.connections)
-    setNodes(currentWorkflow.nodes)
-    setEdges(currentWorkflow.connections)
-
-    }
   const handleAddNode = ({ name, type, variant }: newNodeParams) => {
     const newNodeId = crypto.randomUUID();
     const newNode: Node = {
@@ -89,9 +64,7 @@ export default function Page(params: Promise<{ id: string }>) {
     <div className=" w-screen h-screen">
         <div className="flex justify-around">
             <button className="bg-red-400 px-2">Save Data</button>
-            <DialogList buttonName="List Workflows" setNodes={setNodes} setEdges={setEdges}/>
-            {/* <button className="bg-green-500 px-2">Load Data</button> */}
-            {/* <button className="bg-purple-600 px-2">Load Creds</button> */}
+            <DialogList buttonName="List Workflows" setNodes={setNodes} setEdges={setEdges} nodes={nodes} connections={edges} userId="bf62dba5-4fff-4823-a147-00ac00630169" />
             <DialogInput 
             buttonName={'Load Creds'}
             />

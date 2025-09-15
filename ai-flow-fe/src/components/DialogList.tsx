@@ -12,53 +12,85 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {Node , Edge} from '@xyflow/react'
+
 
 type Workflow = {
   id: string
   title: string
-  nodes: any
-  connections: any
+  nodes: Node[]
+  connections: Edge[]
 }
 
 export function DialogList({
   buttonName,
   setNodes,
   setEdges,
+  nodes,
+  connections,
+  userId,
+  enabled = true,
 }: {
   buttonName: string
-  setNodes: (nodes: any) => void
-  setEdges: (edges: any) => void
+  setNodes: (nodes: Node[]) => void
+  setEdges: (edges: Edge[]) => void
+  nodes: Node[]
+  connections: Edge[]
+  userId: string
+  enabled?: boolean
 }) {
   const [data, setData] = useState<Workflow[]>([])
+  const [title, setTitle] = useState("")
 
-  const handleSubmit = async () => {
-    const body = {
-      userId: "bf62dba5-4fff-4823-a147-00ac00630169",
-    }
-
+  // fetch workflows for user
+  const handleFetch = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/v1/workflow/get", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
       })
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch workflows")
-      }
+      if (!res.ok) throw new Error("Failed to fetch workflows")
 
-      const data = await res.json()
-      console.log("Fetched workflows:", data.message)
-      setData(data.message) // assume API returns { message: Workflow[] }
+      const json = await res.json()
+      setData(json.message)
     } catch (error) {
       console.error("Error fetching workflows:", error)
     }
   }
 
+  // save workflow for user
+  const handleSave = async () => {
+    try {
+      const body = {
+        title,
+        enabled,
+        nodes,
+        connections,
+        userId,
+      }
+
+      const res = await fetch("http://localhost:5000/api/v1/workflow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      if (!res.ok) throw new Error("Failed to save workflow")
+
+      const json = await res.json()
+      console.log("Saved workflow:", json)
+      setTitle("")
+      handleFetch() // refresh list after save
+    } catch (error) {
+      console.error("Error saving workflow:", error)
+    }
+  }
+
   const handleWorkflowClick = (workflow: Workflow) => {
-    console.log("Selected workflow:", workflow)
     setNodes(workflow.nodes)
     setEdges(workflow.connections)
   }
@@ -66,12 +98,7 @@ export function DialogList({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          onClick={() => {
-            handleSubmit()
-          }}
-        >
+        <Button variant="outline" onClick={handleFetch}>
           {buttonName}
         </Button>
       </DialogTrigger>
@@ -80,13 +107,28 @@ export function DialogList({
         <DialogHeader>
           <DialogTitle>Workflows</DialogTitle>
           <DialogDescription>
-            Click a workflow to load its nodes and edges
+            Load or save your workflows
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
+        {/* Save workflow section */}
+        <div className="grid gap-3 mb-4">
+          <Label htmlFor="workflow-title">Workflow Title</Label>
+          <Input
+            id="workflow-title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter workflow name"
+          />
+          <Button onClick={handleSave} disabled={!title}>
+            Save Workflow
+          </Button>
+        </div>
+
+        {/* List workflows section */}
+        <div className="space-y-2 max-h-[200px] overflow-y-auto">
           {data.length === 0 ? (
-            <div className="text-gray-500">Nothing to show here</div>
+            <div className="text-gray-500">No workflows yet</div>
           ) : (
             data.map((e) => (
               <div
