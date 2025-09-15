@@ -23,7 +23,8 @@ import { useCallback } from "react";
 import { NodeSheet } from "@/components/SheetComponent";
 import { getDependencyData } from "@/helper/dependency";
 import prisma from "@/lib/prisma";
-import { DialogButton } from "@/components/Dialog";
+import { DialogInput } from "@/components/Dialog";
+import { DialogList } from "@/components/DialogList";
 
 export default function Page(params: Promise<{ id: string }>) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -88,9 +89,10 @@ export default function Page(params: Promise<{ id: string }>) {
     <div className=" w-screen h-screen">
         <div className="flex justify-around">
             <button className="bg-red-400 px-2">Save Data</button>
-            <button className="bg-green-500 px-2">Load Data</button>
+            <DialogList buttonName="List Workflows" setNodes={setNodes} setEdges={setEdges}/>
+            {/* <button className="bg-green-500 px-2">Load Data</button> */}
             {/* <button className="bg-purple-600 px-2">Load Creds</button> */}
-            <DialogButton 
+            <DialogInput 
             buttonName={'Load Creds'}
             />
         </div>

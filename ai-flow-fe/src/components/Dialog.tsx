@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export function DialogButton({ buttonName }: { buttonName: string }) {
+export function DialogInput({ buttonName }: { buttonName: string }) {
   const [title, setTitle] = useState("")
   const [provider, setProvider] = useState("")
   const [apiKey, setApiKey] = useState("")
