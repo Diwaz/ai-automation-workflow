@@ -8,6 +8,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  FileKey,
   Drone,
   Map,
   PieChart,
@@ -43,7 +44,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Workflows",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
@@ -82,9 +83,9 @@ const data = {
       ],
     },
     {
-      title: "Documentation",
+      title: "Credentials",
       url: "#",
-      icon: BookOpen,
+      icon: FileKey,
       items: [
         {
           title: "Introduction",
