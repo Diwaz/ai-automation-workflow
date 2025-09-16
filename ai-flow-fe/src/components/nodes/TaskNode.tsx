@@ -12,25 +12,6 @@ import { TaskNodeData } from "@/lib/types";
 import { useSheetStore } from "@/store/sheetStore";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 
-/*
- 
-global state => {
-totalNode: 5,
-edges : [
-n1-n2,n3-n2,n2-n4
-]
-n1 : {
-name: "whatsapp",
-id: 21123
-}
-n2:{
-name:telegram
-id:sada13123
-}
-}
-
-/*/
-
 
 export const TaskNode = ({ data }: { data: TaskNodeData }) => {
   const { openSheet } = useSheetStore();
