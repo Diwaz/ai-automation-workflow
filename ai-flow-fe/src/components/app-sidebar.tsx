@@ -8,6 +8,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  Drone,
   Map,
   PieChart,
   Settings2,
@@ -35,19 +36,9 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
+      name: "X-Flow",
+      logo: Drone,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
     },
   ],
   navMain: [
