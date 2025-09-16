@@ -24,14 +24,14 @@ export const NodeSheet = ({
       open={isOpen}
       onOpenChange={(value) => (value ? openSheet() : closeSheet())}
     >
-      <SheetContent className="bg-[#414244] ease-in-out ">
+      <SheetContent className="bg-[#0a0a0a] ease-in-out ">
         <SheetHeader>
-          <SheetTitle className="text-amber-500 text-lg">
-            ALL TOOLS
+          <SheetTitle className="text-white text-lg bg-[#262626] p-2">
+            What happens next ?
           </SheetTitle>
-          <SheetDescription className="text-white">
+          {/* <SheetDescription className="text-white">
             
-          </SheetDescription>
+          </SheetDescription> */}
           <div>
             <NodeLibrary addNode={addNewNode} />
           </div>

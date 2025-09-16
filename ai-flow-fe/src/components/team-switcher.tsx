@@ -27,7 +27,7 @@ export function TeamSwitcher({
       <SidebarMenuItem>
         <SidebarMenuButton
           size="lg"
-          className=" text-sidebar-accent-foreground"
+          className=" text-sidebar-accent-foreground "
         >
           <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
             <activeTeam.logo className="size-4" />
