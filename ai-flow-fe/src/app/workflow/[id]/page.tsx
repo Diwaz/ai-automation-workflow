@@ -48,7 +48,7 @@ export default function Page() {
     taskNode: TaskNode,
     aiNode: AiNode,
   };
-
+  console.log("nodes",nodes)
   const handleAddNode = ({ name, type, variant }: newNodeParams) => {
     const newNodeId = crypto.randomUUID();
     const newNode: Node = {
@@ -61,6 +61,7 @@ export default function Page() {
         type: type,
         deleteNode: handleDeleteNode,
         count: nodes.length + 1,
+        reqFields:['']
         // variant: variant,
       } as TaskNodeData,
       draggable: true,

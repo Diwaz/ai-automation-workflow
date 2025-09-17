@@ -4,6 +4,7 @@ export interface TaskNodeData extends Record<string, unknown> {
   dragging: true;
   type: string;
   count: number;
+  reqFields?:string[];
   variant: "action" | "trigger" | "ifelse";
   deleteNode: (id: string) => void;
 }

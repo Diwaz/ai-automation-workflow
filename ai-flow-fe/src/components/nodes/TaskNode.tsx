@@ -61,7 +61,7 @@ export const TaskNode = ({ data }: { data: TaskNodeData }) => {
           <DialogTitle>Fill this form</DialogTitle>
         </DialogHeader>
         <div>
-          <NodeForm type={data.type} />
+          <NodeForm type={data.type} fields={data.reqFields} />
         </div>
       </DialogContent>
       <p className="text-white flex justify-center">

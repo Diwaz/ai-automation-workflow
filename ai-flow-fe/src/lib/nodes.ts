@@ -68,4 +68,17 @@ export const nodeConfigs = {
       },
     ],
   },
+  ifelse: {
+    label: "If Else",
+    variant: "taskNode",
+    description: "Selects one nodes given the condition",
+    formFields: [
+      {
+        name: "Condition",
+        type: "textarea",
+        placeholder: "Enter your prompt here",
+      },
+      ,
+    ],
+  },
 };
