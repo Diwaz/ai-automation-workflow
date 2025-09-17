@@ -90,6 +90,12 @@ class WorkflowResponse(BaseModel):
 class UUIDbody(BaseModel):
     userId: str
 
+class formBody(BaseModel):
+    action:str
+    payload:List[dict]
+    
+# keeps track of all the triggered events
+trigger_events = []
 
 @app.post("/api/v1/workflows/get",response_model=List[WorkflowResponse])
 def get_workflow(body:UUIDbody,db:Session = Depends(get_db)):
@@ -103,3 +109,80 @@ def get_workflow(body:UUIDbody,db:Session = Depends(get_db)):
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
+
+
+# Form-Trigger Event Listener
+@app.post("/form/{workflow_id}")
+def trigger_event(workflow_id:str,formBody:formBody,db:Session=Depends(get_db)):
+    trigger_output = {}
+    trigger_output["workflow_id"] = workflow_id
+    trigger_output["payload"] = formBody
+    trigger_output["status"] = "pending"
+    workflow = db.query(Workflow).filter(Workflow.id == workflow_id).first()
+    trigger_output["workflow"]= workflow
+    trigger_events.append(trigger_output)
+    print(trigger_events)
+    return {"data":"Event Triggered!!!"}
+
+
+
+mock_data = {
+    "id": str(uuid.uuid4()), 
+    "title": "My First Workflow",
+    "enabled": True,
+    "nodes": [
+        {
+            "id": str(uuid.uuid4()),
+            "data": {
+                "id": "form-node-1",
+                "name": "Form",
+                "type": "form",
+                "fields": [
+                    {
+                        "form_field": "text",
+                        "form_label": "Name",
+                        "form_value": "randomUser"
+                    },
+                    {
+                        "form_field": "text",
+                        "form_label": "Email",
+                        "form_value": "example@gmail.com"
+                    }
+                ]
+            },
+            "type": "taskNode",
+            "position": {"x": 100, "y": 150},
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "data": {
+                "id": "gmail-node-1",
+                "name": "Gmail",
+                "type": "gmail",
+                "to_send": "Hello you are accepted",
+                "to": "example@gmail.com", 
+                "subject": "Message"
+            },
+            "type": "taskNode",
+            "position": {"x": 400, "y": 200},
+        },
+    ],
+    "connections": [
+        {
+            "id": f"edge-{uuid.uuid4()}",
+            "source": "form-node-1",
+            "target": "gmail-node-1"
+        }
+    ]
+}
+# class Nodes(BaseModel):
+
+def execute_nodes(workflow):
+    nodes=workflow["nodes"]
+    for node in nodes:
+        print("label",node["data"]["type"])
+        execute_node_type = node["data"]["type"]
+        print(execute_node_type)
+        # if
+
+# execute_nodes(mock_data)
