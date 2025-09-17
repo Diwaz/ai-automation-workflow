@@ -10,9 +10,16 @@ from sqlalchemy.types import DateTime
 from fastapi import FastAPI,Depends,HTTPException
 from pydantic import BaseModel
 from uuid import UUID as UUIDv2
+import asyncio
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
 
+load_dotenv()
 # create engine
 engine= create_engine('postgresql://postgres:admin@localhost:5432/postgres')
 # base class for modals
@@ -93,7 +100,7 @@ class UUIDbody(BaseModel):
 class formBody(BaseModel):
     action:str
     payload:List[dict]
-    
+
 # keeps track of all the triggered events
 trigger_events = []
 
@@ -121,10 +128,67 @@ def trigger_event(workflow_id:str,formBody:formBody,db:Session=Depends(get_db)):
     workflow = db.query(Workflow).filter(Workflow.id == workflow_id).first()
     trigger_output["workflow"]= workflow
     trigger_events.append(trigger_output)
-    print(trigger_events)
-    return {"data":"Event Triggered!!!"}
+    return {"data":"Event Triggered !!"}
 
+async def worker():
+    while True:
+        if trigger_events:
+            print("Executing workflow started")
+            job = trigger_events.pop(0)
+            trigger_output = job["payload"]
+            # print("receiver",trigger_output.payload[0]["to"])
+            receiver = trigger_output.payload[0]["to"]
+            workflow = job["workflow"]
+            nodes= workflow.nodes
+            # print(":::::WORKKKKFLOWW::::",workflow.nodes[1])
+            for node in nodes:
+                print("::::NODE::::",node["data"]["type"])
+                type = node["data"]["type"]
+                if node["data"]["count"] > 1:
+                    if type == "telegram":
+                        print("Message sent to telegram")
+                        sendMail(receiver)
 
+                    else:
+                        print("Message not sent")
+        await asyncio.sleep(1)
+
+def sendMail(receiver:str):
+    smtp_server="smtp.gmail.com"
+    port= 587
+    secret = os.getenv("GMAIL_APP_PASS")
+    sender_email= "y2kdwz@gmail.com"
+    password=secret
+    receiver_email = receiver
+    
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Welcome to 100xDevs"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    text = "Hello, This mail is from 100xdevs congratulation welcome to the server"
+    html = """\
+        <html>
+            <body>
+                <p> Hi,<br>
+                This is an official mail sent from SMTP server
+                </p>
+            </body>
+        </html>
+            """
+    part1 = MIMEText(text,"plain")
+    part2= MIMEText(html,"html")
+    message.attach(part1)
+    message.attach(part2)
+
+    with smtplib.SMTP(smtp_server,port) as server:
+        server.starttls()
+        server.login(sender_email,password)
+        server.sendmail(sender_email,receiver_email,message.as_string())
+
+@app.on_event("startup")
+async def start_worker():
+    asyncio.create_task(worker())
 
 mock_data = {
     "id": str(uuid.uuid4()), 
