@@ -142,49 +142,60 @@ async def worker():
             nodes= workflow.nodes
             # print(":::::WORKKKKFLOWW::::",workflow.nodes[1])
             for node in nodes:
-                print("::::NODE::::",node["data"]["type"])
+                # print("::::NODE::::",node["data"]["type"])
                 type = node["data"]["type"]
                 if node["data"]["count"] > 1:
                     if type == "telegram":
                         print("Message sent to telegram")
-                        sendMail(receiver)
-
+                        res = sendMail(receiver,"Telegram")
+                        print("tg res",res)
+                    elif type == "whatsapp":
+                        print("Message sent to whatsapp")
+                        res = sendMail(receiver,"Whatsapp")
+                        print("whatsapp res",res)
                     else:
                         print("Message not sent")
+            print("Workflow ended")
         await asyncio.sleep(1)
 
-def sendMail(receiver:str):
+def sendMail(receiver:str,messageBody:str):
     smtp_server="smtp.gmail.com"
     port= 587
     secret = os.getenv("GMAIL_APP_PASS")
     sender_email= "y2kdwz@gmail.com"
     password=secret
     receiver_email = receiver
-    
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Welcome to 100xDevs"
-    message["From"] = sender_email
-    message["To"] = receiver_email
+    try: 
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "Welcome to 100xDevs"
+        message["From"] = sender_email
+        message["To"] = receiver_email
 
-    text = "Hello, This mail is from 100xdevs congratulation welcome to the server"
-    html = """\
-        <html>
-            <body>
-                <p> Hi,<br>
-                This is an official mail sent from SMTP server
-                </p>
-            </body>
-        </html>
-            """
-    part1 = MIMEText(text,"plain")
-    part2= MIMEText(html,"html")
-    message.attach(part1)
-    message.attach(part2)
+        text = "Hello, This mail is from 100xdevs congratulation welcome to the server"
+        html = f"""\
+            <html>
+                <body>
+                    <p> Hi,<br>
+                    This is an official mail sent from SMTP server
+                    sent by ---------------------{messageBody}
+                    </p>
+                </body>
+            </html>
+                """
+        part1 = MIMEText(text,"plain")
+        part2= MIMEText(html,"html")
+        message.attach(part1)
+        message.attach(part2)
 
-    with smtplib.SMTP(smtp_server,port) as server:
-        server.starttls()
-        server.login(sender_email,password)
-        server.sendmail(sender_email,receiver_email,message.as_string())
+        with smtplib.SMTP(smtp_server,port) as server:
+            server.starttls()
+            server.login(sender_email,password)
+            server.sendmail(sender_email,receiver_email,message.as_string())
+            return "Success"
+        
+    except Exception as e:
+        print("failed to send mail")
+        return "Failed"
 
 @app.on_event("startup")
 async def start_worker():
