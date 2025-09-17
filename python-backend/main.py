@@ -16,6 +16,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import HumanMessage
 
 app = FastAPI()
 
@@ -140,23 +142,62 @@ async def worker():
             receiver = trigger_output.payload[0]["to"]
             workflow = job["workflow"]
             nodes= workflow.nodes
-            # print(":::::WORKKKKFLOWW::::",workflow.nodes[1])
+            # print(":::::WORKKKKFLOWW::::",workflow.id)
+            workflowId = workflow.id
+            response_from_node = {}
             for node in nodes:
-                # print("::::NODE::::",node["data"]["type"])
+                # print("::::NODE::::",node)
                 type = node["data"]["type"]
                 if node["data"]["count"] > 1:
+                    count = node["data"]["count"]
                     if type == "telegram":
                         print("Message sent to telegram")
-                        res = sendMail(receiver,"Telegram")
-                        print("tg res",res)
+                        inputToNode=find_response(response_from_node,workflowId,count)
+                        res = sendMail(receiver,inputToNode)
+                        # print("tg res",res)
+                        print("tg res")
+                        store_response(response_from_node,workflowId,count,True,'response from tele')
                     elif type == "whatsapp":
+                        inputToNode =find_response(response_from_node,workflowId,count)
+                        print("input to this node",response_from_node)
                         print("Message sent to whatsapp")
-                        res = sendMail(receiver,"Whatsapp")
-                        print("whatsapp res",res)
+                        res = sendMail(receiver,res)
+                        # print("whatsapp res",res)
+                        print("whatsapp res")
+                        store_response(response_from_node,workflowId,count,False,'')
+                    elif type == "aiagent":
+                        find_response(response_from_node,workflowId,count)
+                        print("calling ai agent")
+                        res = call_llm()
+                        store_response(response_from_node,workflowId,count,True,res)
                     else:
                         print("Message not sent")
             print("Workflow ended")
         await asyncio.sleep(1)
+
+def find_response(payload:dict,id:str,count:int):
+    print("To find wheather the prev node provide any output")
+    newCountId = count-1
+    code = f"f{id}-{str(newCountId)}"
+    print("code to add",code)
+    if len(payload) == 0:
+        print("reached here in empty")
+        return False
+    if payload[code]["response"]:
+        print("output exist")
+        output = payload[code]["output"]
+        return output 
+    return False
+
+def store_response(payload:dict,id:str,count:int,response:bool,output:str):
+    newCountId = count
+    code = f"f{id}-{str(newCountId)}"
+
+    if code not in payload:
+        payload[code]= {}
+    
+    payload[code]["response"] = True
+    payload[code]['output'] = output
 
 def sendMail(receiver:str,messageBody:str):
     smtp_server="smtp.gmail.com"
@@ -176,8 +217,7 @@ def sendMail(receiver:str,messageBody:str):
             <html>
                 <body>
                     <p> Hi,<br>
-                    This is an official mail sent from SMTP server
-                    sent by ---------------------{messageBody}
+                    {messageBody}
                     </p>
                 </body>
             </html>
@@ -197,67 +237,15 @@ def sendMail(receiver:str,messageBody:str):
         print("failed to send mail")
         return "Failed"
 
+def call_llm():
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
+    result = llm.invoke("You are an email assistant send a very short email congratulating joining to 100xSchool also give slight hint that this message was executed after different node execution and finally reached the ai part")
+    # print (result.content)
+    return result.content
+
+
 @app.on_event("startup")
 async def start_worker():
     asyncio.create_task(worker())
 
-mock_data = {
-    "id": str(uuid.uuid4()), 
-    "title": "My First Workflow",
-    "enabled": True,
-    "nodes": [
-        {
-            "id": str(uuid.uuid4()),
-            "data": {
-                "id": "form-node-1",
-                "name": "Form",
-                "type": "form",
-                "fields": [
-                    {
-                        "form_field": "text",
-                        "form_label": "Name",
-                        "form_value": "randomUser"
-                    },
-                    {
-                        "form_field": "text",
-                        "form_label": "Email",
-                        "form_value": "example@gmail.com"
-                    }
-                ]
-            },
-            "type": "taskNode",
-            "position": {"x": 100, "y": 150},
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "data": {
-                "id": "gmail-node-1",
-                "name": "Gmail",
-                "type": "gmail",
-                "to_send": "Hello you are accepted",
-                "to": "example@gmail.com", 
-                "subject": "Message"
-            },
-            "type": "taskNode",
-            "position": {"x": 400, "y": 200},
-        },
-    ],
-    "connections": [
-        {
-            "id": f"edge-{uuid.uuid4()}",
-            "source": "form-node-1",
-            "target": "gmail-node-1"
-        }
-    ]
-}
-# class Nodes(BaseModel):
-
-def execute_nodes(workflow):
-    nodes=workflow["nodes"]
-    for node in nodes:
-        print("label",node["data"]["type"])
-        execute_node_type = node["data"]["type"]
-        print(execute_node_type)
-        # if
-
-# execute_nodes(mock_data)
