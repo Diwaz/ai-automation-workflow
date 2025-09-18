@@ -1,4 +1,14 @@
+import {Node , Edge} from '@xyflow/react'
 
+
+export type Workflow = {
+  id: string
+  enabled:boolean
+  userId:string
+  title: string
+  nodes: Node[]
+  connections: Edge[]
+}
 export interface TaskNodeData extends Record<string, unknown> {
   id: string;
   name: string;

@@ -39,12 +39,15 @@ import { NodeSheet } from "@/components/SheetComponent";
 import { DialogInput } from "@/components/Dialog";
 import { DialogList } from "@/components/DialogList";
 import { FormNode } from "@/components/nodes/FormNode";
+import { Button } from "@/components/ui/button";
+import { useWorkflowStore } from "@/store/workflowStore";
 
 
 export default function Page() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const { isOpen, openSheet, closeSheet } = useSheetStore();
+  const {getWorkflowId,getWorkflow} = useWorkflowStore();
   const nodeTypes: NodeTypes = {
     taskNode: TaskNode,
     aiNode: AiNode,
@@ -71,6 +74,34 @@ export default function Page() {
 
     setNodes((nds) => [...nds, newNode]);
   };
+
+  const handleUpdate = async (id:string)=>{
+    const currentWorkflow = getWorkflow()
+    console.log("get workflow",currentWorkflow)
+    if (currentWorkflow === undefined){
+      console.error("UNDEFINED WORKFLOW")
+    }
+    currentWorkflow.nodes = nodes
+    currentWorkflow.connections = edges
+    try {
+      const res = await fetch(`http://localhost:8000/workflow/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(currentWorkflow),
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (!res.ok) throw new Error("Failed to fetch workflows")
+
+      console.log("response from updating workflow",res)
+
+
+    } catch (error) {
+      console.error("Error updating workflows:", error)
+    }
+
+    // console.log("clicked",currentWorkflow)
+  }
+
   const handleDeleteNode = (id: string) => {
     setNodes((n) => n.filter((node) => node.id !== id));
   };
@@ -114,6 +145,12 @@ export default function Page() {
             <DialogInput 
             buttonName={'Load Creds'}
             />
+            <Button onClick={()=>{
+              const id = getWorkflowId()
+              handleUpdate(id)
+            }}>
+              Update
+              </Button>
         </div>
      <ReactFlowProvider>
         <ReactFlow

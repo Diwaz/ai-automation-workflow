@@ -15,10 +15,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {Node , Edge} from '@xyflow/react'
+import { useWorkflowStore } from "@/store/workflowStore"
 
 
 type Workflow = {
   id: string
+  enabled:boolean
+  userId:string
   title: string
   nodes: Node[]
   connections: Edge[]
@@ -43,7 +46,7 @@ export function DialogList({
 }) {
   const [data, setData] = useState<Workflow[]>([])
   const [title, setTitle] = useState("")
-
+  const {setWorkflowId,setWorkflow} = useWorkflowStore();
   // fetch workflows for user
   const handleFetch = async () => {
     try {
@@ -91,6 +94,9 @@ export function DialogList({
   }
 
   const handleWorkflowClick = (workflow: Workflow) => {
+    setWorkflowId(workflow.id)
+    console.log("workflow to set",workflow)
+    setWorkflow(workflow) 
     setNodes(workflow.nodes)
     setEdges(workflow.connections)
   }
