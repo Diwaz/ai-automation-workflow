@@ -4,7 +4,6 @@ export default function NodeForm({ type,fields }: { type: string,fields?:string[
   const config = nodeConfigs[type as keyof typeof nodeConfigs];
 
   if (!config) return <p>Unknown node type</p>;
-  fields?.push('email')
   return (
     <form className="flex flex-col gap-3 text-white">
       {config.formFields.map((field) => (

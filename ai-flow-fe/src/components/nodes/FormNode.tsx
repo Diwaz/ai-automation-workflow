@@ -6,16 +6,16 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Handle, NodeToolbar, Position } from "@xyflow/react";
-import NodeForm from "../NodeForm";
 
 import { Button } from "../ui/button";
-import { TaskNodeData } from "@/lib/types";
+import { FormNode as FormNodeData } from "@/lib/types";
 import { useSheetStore } from "@/store/sheetStore";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import FormNodeForm from "../FormNodeForm";
+import Image from "next/image";
 
 
-export const FormNode = ({ data }: { data: TaskNodeData }) => {
+export const FormNode = ({ data }: { data: FormNodeData }) => {
   const { openSheet } = useSheetStore();
   return (
     <Dialog>
@@ -42,11 +42,14 @@ export const FormNode = ({ data }: { data: TaskNodeData }) => {
         <DialogTrigger asChild>
           <div className="flex items-center space-x-2">
             <Handle type="source" position={Position.Right} />
-            <img
-              src={`/logos/${data.type}.svg`}
-              alt={data.type}
-              className="w-8 h-8"
-            />
+                <Image
+                src={`/logos/${data.type}.svg`}
+                alt={data.type}
+                width={32} 
+                height={32} 
+                // className="w-8 h-8"
+                />
+
             {data.count !== 1 && (
                 <Handle
                 type="target"
@@ -64,7 +67,7 @@ export const FormNode = ({ data }: { data: TaskNodeData }) => {
         </DialogHeader>
         <div>
           {/* <NodeForm type={data.type} fields={data.reqFields} /> */}
-          <FormNodeForm type={data.type} fields={data.reqFields}/>
+          <FormNodeForm node={data}  />
         </div>
       </DialogContent>
       <p className="text-white flex justify-center">
