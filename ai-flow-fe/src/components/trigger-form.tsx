@@ -82,16 +82,7 @@ export function TriggerForm({
               <div className="grid gap-6">
                 <div className="grid gap-3">
                   {fields.map((field)=>(
-                  //     <div key={field.id}>
-                  //       <div className="label">
-                  //         <Label>
-                  //         {field.label}
-                  //         </Label>
-                  //         </div>
-                  //       <div className="label">
-                  //         <Input type={field.type} />
-                  //       </div>
-                  //     </div>
+
                   <div key={field.id} className="grid gap-3">
 
                   <Label htmlFor="email">{field.label}</Label>

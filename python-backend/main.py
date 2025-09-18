@@ -109,6 +109,14 @@ class WorkflowResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class UpdateWorkflow(BaseModel):
+    id:str
+    title:str
+    enabled:bool
+    nodes:List[dict]
+    connections:List[dict]
+    userId:str
+
 class UUIDbody(BaseModel):
     userId: str
 
@@ -139,6 +147,22 @@ def get_workflow(workflow_id:str,db:Session=Depends(get_db)):
         return {"error": e}
 
     return {workflow}
+
+@app.patch("/workflow/{workflow_id}")
+def update_workflow(workflow_id:str,updatedBody:UpdateWorkflow,db:Session =Depends(get_db)):
+    if not workflow_id:
+        raise HTTPException(status_code=400,detail="Invalid User Id")
+    try:
+        print("workflowid",updatedBody.id)
+        updated_data = updatedBody.dict(exclude_unset=True)
+        db.query(Workflow).filter(Workflow.id == workflow_id).update(
+            updated_data
+        )
+        db.commit()
+    except Exception as e:
+        return {"error": str(e)}
+
+    return {"Updated"}
 
 
 # Form-Trigger Event Listener
