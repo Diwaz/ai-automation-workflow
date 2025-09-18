@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +11,56 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useEffect, useState } from "react";
 
+interface TriggerFormProps extends React.ComponentProps<"div">{
+  workflowId: string
+}
+
+interface Field {
+  id: string,
+  type: string,
+  label:string
+}
 export function TriggerForm({
   className,
+  workflowId,
   ...props
-}: React.ComponentProps<"div">) {
+}: TriggerFormProps) {
+
+  const [fields ,setFields] = useState<Field[]>([])
+
+  const handleFetch = async () => {
+    try {
+      const res = await fetch(`http://localhost:8000/workflow/${workflowId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (!res.ok) throw new Error("Failed to fetch workflows")
+
+      const json = await res.json()
+    
+      const node = json[0].nodes[0]
+
+      if (node.data.fields){
+        console.log("here")
+        setFields(node.data.fields)
+      }
+
+      console.log("json response workflow",node.data.fields[0])
+      console.log("fields",fields)
+      // setData(json.message)
+    } catch (error) {
+      console.error("Error fetching workflows:", error)
+    }
+  }
+  
+  useEffect(()=>{
+    handleFetch();
+    },[])
+
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -34,14 +81,30 @@ export function TriggerForm({
               </div>
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
+                  {fields.map((field)=>(
+                  //     <div key={field.id}>
+                  //       <div className="label">
+                  //         <Label>
+                  //         {field.label}
+                  //         </Label>
+                  //         </div>
+                  //       <div className="label">
+                  //         <Input type={field.type} />
+                  //       </div>
+                  //     </div>
+                  <div key={field.id} className="grid gap-3">
+
+                  <Label htmlFor="email">{field.label}</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
+                    id={field.type}
+                    type={field.type}
+                    placeholder={field.label}
                     required
-                  />
-                </div> 
+                    />
+                    </div>
+ 
+                  ))}
+               </div> 
                 <Button type="submit" className="w-full">
                   Submit
                 </Button>

@@ -15,7 +15,7 @@ export default function NodeForm({ type,fields }: { type: string,fields?:string[
           type={field?.type}
           name={field?.name}
           placeholder={field?.placeholder}
-          required={field?.required}
+          // required={field?.required}
           className="border rounded p-2 text-black"
           />
           </div>

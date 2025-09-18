@@ -1,8 +1,11 @@
 import { Drone } from "lucide-react"
 
 import { TriggerForm } from "@/components/trigger-form"
+import { useRouter } from "next/router"
 
-export default function LoginPage() {
+export default function LoginPage({params}) {
+  const {id} = params;
+  // console.log("workflow id ",id)
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -12,7 +15,7 @@ export default function LoginPage() {
           </div>
           X-Flow
         </a>
-        <TriggerForm />
+        <TriggerForm workflowId={id}/>
       </div>
     </div>
   )

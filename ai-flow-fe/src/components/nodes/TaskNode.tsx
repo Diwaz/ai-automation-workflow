@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import { TaskNodeData } from "@/lib/types";
 import { useSheetStore } from "@/store/sheetStore";
 import { RiDeleteBin5Fill } from "react-icons/ri";
-
+import Image from "next/image";
 
 export const TaskNode = ({ data }: { data: TaskNodeData }) => {
   const { openSheet } = useSheetStore();
@@ -40,11 +40,13 @@ export const TaskNode = ({ data }: { data: TaskNodeData }) => {
         <DialogTrigger asChild>
           <div className="flex items-center space-x-2">
             <Handle type="source" position={Position.Right} />
-            <img
-              src={`/logos/${data.type}.svg`}
-              alt={data.type}
-              className="w-8 h-8"
-            />
+              <Image
+                src={`/logos/${data.type}.svg`}
+                alt={data.type}
+                width={32} 
+                height={32} 
+              />
+
             {data.count !== 1 && (
                 <Handle
                 type="target"

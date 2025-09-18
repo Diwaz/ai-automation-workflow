@@ -18,8 +18,21 @@ import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 load_dotenv()
 # create engine
@@ -107,7 +120,7 @@ class formBody(BaseModel):
 trigger_events = []
 
 @app.post("/api/v1/workflows/get",response_model=List[WorkflowResponse])
-def get_workflow(body:UUIDbody,db:Session = Depends(get_db)):
+def get_workflows(body:UUIDbody,db:Session = Depends(get_db)):
     print("******************userId*******************",body.userId)
     if not body.userId:
         raise HTTPException(status_code=400,detail="Invalid User Id")
@@ -115,9 +128,17 @@ def get_workflow(body:UUIDbody,db:Session = Depends(get_db)):
     return workflows
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/workflow/{workflow_id}")
+def get_workflow(workflow_id:str,db:Session=Depends(get_db)):
+    if not workflow_id:
+        raise HTTPException(status_code=400,detail="Invalid User Id")
+    try:
+        workflow = db.query(Workflow).filter(Workflow.id == workflow_id).first()
+        print("DATA:::::::::::",workflow)
+    except Exception as e:
+        return {"error": e}
+
+    return {workflow}
 
 
 # Form-Trigger Event Listener
