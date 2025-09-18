@@ -1,17 +1,15 @@
 export const nodeConfigs = {
   form: {
     label: "Form",
-    variant: "taskNode",
+    variant: "formNode",
     description: "Collect user input through a customizable form.",
     formFields: [
       {
-        name: "title",
+        name: "email",
         type: "text",
         placeholder: "Form title",
         required: true,
       },
-      { name: "description", type: "text", placeholder: "Form description" },
-      { name: "submitLabel", type: "text", placeholder: "Submit button label" },
     ],
   },
   telegram: {

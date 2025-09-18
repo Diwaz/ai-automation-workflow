@@ -1,3 +1,4 @@
+
 export interface TaskNodeData extends Record<string, unknown> {
   id: string;
   name: string;
@@ -7,6 +8,16 @@ export interface TaskNodeData extends Record<string, unknown> {
   reqFields?:string[];
   variant: "action" | "trigger" | "ifelse";
   deleteNode: (id: string) => void;
+}
+
+export interface FormNode {
+  id : string;
+  variant: "trigger";
+  name: string;
+  dragging:true;
+  count:number;
+  deleteNode:(id:string)=>void;
+  reqFields?: string[];
 }
 
 export type newNodeParams = {

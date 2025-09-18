@@ -38,6 +38,7 @@ import { useCallback } from "react";
 import { NodeSheet } from "@/components/SheetComponent";
 import { DialogInput } from "@/components/Dialog";
 import { DialogList } from "@/components/DialogList";
+import { FormNode } from "@/components/nodes/FormNode";
 
 
 export default function Page() {
@@ -47,6 +48,7 @@ export default function Page() {
   const nodeTypes: NodeTypes = {
     taskNode: TaskNode,
     aiNode: AiNode,
+    formNode:FormNode
   };
   console.log("nodes",nodes)
   const handleAddNode = ({ name, type, variant }: newNodeParams) => {

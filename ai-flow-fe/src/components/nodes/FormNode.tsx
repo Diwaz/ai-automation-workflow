@@ -7,13 +7,15 @@ import {
 } from "../ui/dialog";
 import { Handle, NodeToolbar, Position } from "@xyflow/react";
 import NodeForm from "../NodeForm";
+
 import { Button } from "../ui/button";
 import { TaskNodeData } from "@/lib/types";
 import { useSheetStore } from "@/store/sheetStore";
 import { RiDeleteBin5Fill } from "react-icons/ri";
+import FormNodeForm from "../FormNodeForm";
 
 
-export const TaskNode = ({ data }: { data: TaskNodeData }) => {
+export const FormNode = ({ data }: { data: TaskNodeData }) => {
   const { openSheet } = useSheetStore();
   return (
     <Dialog>
@@ -56,17 +58,18 @@ export const TaskNode = ({ data }: { data: TaskNodeData }) => {
         </DialogTrigger>
       </div>
 
-      <DialogContent >
+      <DialogContent className=" ">
         <DialogHeader>
-          <DialogTitle>Credentials</DialogTitle>
+          <DialogTitle>Form Builder</DialogTitle>
         </DialogHeader>
         <div>
-          <NodeForm type={data.type} fields={data.reqFields} />
+          {/* <NodeForm type={data.type} fields={data.reqFields} /> */}
+          <FormNodeForm type={data.type} fields={data.reqFields}/>
         </div>
       </DialogContent>
-      <p className="text-blue-600 flex justify-center">
+      <p className="text-white flex justify-center">
     {data.name}
       </p>
     </Dialog>
   );
-};
+}
