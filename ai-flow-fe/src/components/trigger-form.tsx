@@ -29,7 +29,36 @@ export function TriggerForm({
 }: TriggerFormProps) {
 
   const [fields ,setFields] = useState<Field[]>([])
+  const [hasSubmit,setHasSubmit] = useState(false)
+  const [email,setEmail] = useState('')
+  const handleTriggerSubmit = async () =>{
+    const body = {
+      action:'FORM_SUBMIT',
+      payload :[
+        {
+          email 
+        }
+      ]
+    }
+        try {
+      const res = await fetch(`http://localhost:8000/form/${workflowId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
 
+      if (!res.ok) throw new Error("Failed to fetch workflows")
+
+      const json = await res.json()
+    
+
+      console.log("json response from posting form",json)
+      setHasSubmit(true)
+    } catch (error) {
+      console.error("Error fetching workflows:", error)
+    }
+
+  }
   const handleFetch = async () => {
     try {
       const res = await fetch(`http://localhost:8000/workflow/${workflowId}`, {
@@ -64,22 +93,27 @@ export function TriggerForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader className="text-center">
+          {!hasSubmit && 
+         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome</CardTitle>
           <CardDescription>
             Fill up the form to begin the process !
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form>
+          
+          }
+       <CardContent>
+          {/* <form> */}
             <div className="grid gap-6">
               
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
+              
+             { !hasSubmit &&   <span className="bg-card text-muted-foreground relative z-10 px-2">
                   Lets Begin 
-                </span>
+                </span>}
               </div>
-              <div className="grid gap-6">
+                {!hasSubmit && 
+               <div className="grid gap-6">
                 <div className="grid gap-3">
                   {fields.map((field)=>(
 
@@ -91,17 +125,27 @@ export function TriggerForm({
                     type={field.type}
                     placeholder={field.label}
                     required
+                    onChange={(e)=>{
+                      setEmail(e.target.value)
+                    }}
                     />
                     </div>
  
                   ))}
                </div> 
-                <Button type="submit" className="w-full">
+                <Button  className="w-full" onClick={()=>{
+                  handleTriggerSubmit()
+                }}>
                   Submit
                 </Button>
-              </div>
-            </div>
-          </form>
+              </div>               
+                } {hasSubmit && <div className="flex justify-center">
+                            <CardDescription>
+            Thanks for filling Up the Form , Our Team Will Contact You Shortly!
+          </CardDescription>
+                  </div>}
+           </div>
+          {/* </form> */}
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">

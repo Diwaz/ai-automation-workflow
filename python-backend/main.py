@@ -169,8 +169,10 @@ def update_workflow(workflow_id:str,updatedBody:UpdateWorkflow,db:Session =Depen
 @app.post("/form/{workflow_id}")
 def trigger_event(workflow_id:str,formBody:formBody,db:Session=Depends(get_db)):
     trigger_output = {}
+    print("reached here")
     trigger_output["workflow_id"] = workflow_id
     trigger_output["payload"] = formBody
+    print("form body",formBody)
     trigger_output["status"] = "pending"
     workflow = db.query(Workflow).filter(Workflow.id == workflow_id).first()
     trigger_output["workflow"]= workflow
@@ -184,7 +186,8 @@ async def worker():
             job = trigger_events.pop(0)
             trigger_output = job["payload"]
             # print("receiver",trigger_output.payload[0]["to"])
-            receiver = trigger_output.payload[0]["to"]
+            receiver = trigger_output.payload[0]["email"]
+            print("email",receiver)
             workflow = job["workflow"]
             nodes= workflow.nodes
             # print(":::::WORKKKKFLOWW::::",workflow.id)
@@ -206,7 +209,7 @@ async def worker():
                         inputToNode =find_response(response_from_node,workflowId,count)
                         print("input to this node",response_from_node)
                         print("Message sent to whatsapp")
-                        res = sendMail(receiver,res)
+                        res = sendMail(receiver,inputToNode)
                         # print("whatsapp res",res)
                         print("whatsapp res")
                         store_response(response_from_node,workflowId,count,False,'')
@@ -256,6 +259,9 @@ def sendMail(receiver:str,messageBody:str):
         message["Subject"] = "Welcome to 100xDevs"
         message["From"] = sender_email
         message["To"] = receiver_email
+
+        if messageBody == 'False':
+            messageBody = "Thanks For Apply to 100xDevs Now Wait for further processing"
 
         text = "Hello, This mail is from 100xdevs congratulation welcome to the server"
         html = f"""\
